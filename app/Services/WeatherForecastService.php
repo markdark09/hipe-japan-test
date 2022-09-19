@@ -43,7 +43,7 @@ class WeatherForecastService
             foreach ($cities as $key => $city) {
                 array_push($generalList, 
                     $this->openWeatherMapLib
-                        ->fetchWeatherData($city['latitude'], $city['longitude'])
+                        ->fetchWeatherByCoordinates($city['latitude'], $city['longitude'])
                 );
             }
         }
@@ -62,7 +62,7 @@ class WeatherForecastService
     {
         $generalList = $this->getListOfCitiesWithWeatherForecast();
 
-        usort($generalList, function($a, $b){
+        usort($generalList, function($a, $b) {
             $a = $a['weather'][0]['id'];
             $b = $b['weather'][0]['id'];
 
@@ -70,5 +70,39 @@ class WeatherForecastService
         });
 
         return $generalList;
+    }
+
+    /**
+     * Get weather forecast of specified
+     * city by id.
+     * 
+     * @param int $latitude
+     * @param int $longitude
+     * 
+     * @return collection
+     */
+    public function getWeatherDataByCoordinates(int $latitude, int $longitude)
+    {
+        $cityWeather = $this->openWeatherMapLib
+            ->fetchWeatherByCoordinates($latitude, $longitude);
+
+        return $cityWeather;
+    }
+
+    /**
+     * Get weather forecast of specified
+     * city by id.
+     * 
+     * @param int $latitude
+     * @param int $longitude 
+     * 
+     * @return collection
+     */
+    public function getForecastedWeatherDataByCoordinates(int $latitude, int $longitude)
+    {
+        $forecastedCity = $this->openWeatherMapLib
+            ->fetchForecastedWeatherByCoordinates($latitude, $longitude);
+
+        return $forecastedCity;
     }
 }

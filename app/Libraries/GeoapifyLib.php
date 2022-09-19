@@ -50,8 +50,8 @@ class GeoapifyLib
 
                 array_push($cities, [
                     'geoapify_id' => $properties['place_id'],
-                    'longitude' => $properties['lon'],
-                    'latitude' => $properties['lat']
+                    'latitude' => $properties['lat'],
+                    'longitude' => $properties['lon']
                 ]);
             }
 

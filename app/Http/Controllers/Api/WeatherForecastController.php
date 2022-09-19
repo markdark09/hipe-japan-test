@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CoordinatesRequest;
 use App\Services\WeatherForecastService;
 
 class WeatherForecastController extends Controller
@@ -44,6 +45,36 @@ class WeatherForecastController extends Controller
     {
         $sortedByBaseWeather = $this->weatherForecastService
             ->sortListOfCitiesByBaseWeather();
+
+        return responder()->success($sortedByBaseWeather);
+    }
+
+    /**
+     * Get single city w/ basic open weather data
+     * 
+     * @param CoordinatesRequest $request
+     * 
+     * @return Responder
+     */
+    public function singleCurrentDetails(CoordinatesRequest $request)
+    {
+        $sortedByBaseWeather = $this->weatherForecastService
+            ->getWeatherDataByCoordinates($request['latitude'], $request['longitude']);
+
+        return responder()->success($sortedByBaseWeather);
+    }
+
+    /**
+     * Get single city w/ basic open weather data
+     * 
+     * @param CoordinatesRequest $request
+     * 
+     * @return Responder
+     */
+    public function singleGetFullDetails(CoordinatesRequest $request)
+    {
+        $sortedByBaseWeather = $this->weatherForecastService
+            ->getForecastedWeatherDataByCoordinates($request['latitude'], $request['longitude']);
 
         return responder()->success($sortedByBaseWeather);
     }
