@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Libraries\OpenWeatherMapLib;
+use App\Services\WeatherForecastService;
 use Illuminate\Support\Facades\Cache;
 
 class WeatherForecastController extends Controller
 {
-    public $openWeatherMapLib;
+    public $weatherForecastService;
 
     /**
      * Constructor of WeatherForecastController
      * 
-     * @param App\Libraries\OpenWeatherMapLib $openWeatherMapLib
+     * @param \WeatherForecastService $weatherForecastService
      */
-    public function __construct(OpenWeatherMapLib $openWeatherMapLib)
+    public function __construct(WeatherForecastService $weatherForecastService)
     {
-        $this->openWeatherMapLib = $openWeatherMapLib;
+        $this->weatherForecastService = $weatherForecastService;
     }
 
     /**
@@ -28,18 +28,9 @@ class WeatherForecastController extends Controller
      */
     public function generalList() 
     {
-        $cities = Cache::get('cities');
-        $generalList = [];
+        $list = $this->weatherForecastService
+            ->generalList();
 
-        if (count($cities) > 0) {
-            foreach ($cities as $key => $city) {
-                array_push($generalList, 
-                    $this->openWeatherMapLib
-                        ->fetchWeatherData($city['latitude'], $city['longitude'])
-                );
-            }
-        }
-
-        return responder()->success($generalList);
+        return responder()->success($list);
     }
 }
