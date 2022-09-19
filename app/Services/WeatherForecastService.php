@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Libraries\OpenWeatherMapLib;
 use App\Repositories\Interfaces\IWeatherForecastRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 
 class WeatherForecastService 
@@ -31,9 +32,9 @@ class WeatherForecastService
      * Get list of cities(cached) and return 
      * the list w/ basic open weather data
      * 
-     * @return Responder
+     * @return array
      */
-    public function generalList() 
+    public function getListOfCitiesWithWeatherForecast() 
     {
         $cities = Cache::get('cities');
         $generalList = [];
@@ -46,6 +47,27 @@ class WeatherForecastService
                 );
             }
         }
+
+        return $generalList;
+    }
+
+    /**
+     * Use the getListOfCitiesWithWeatherForecast 
+     * and categorized base on their weather ex. 
+     * by Rain, by Sunny, and etc.
+     * 
+     * @return array
+     */
+    public function sortListOfCitiesByBaseWeather()
+    {
+        $generalList = $this->getListOfCitiesWithWeatherForecast();
+
+        usort($generalList, function($a, $b){
+            $a = $a['weather'][0]['id'];
+            $b = $b['weather'][0]['id'];
+
+            return ($a < $b) ? -1 : 1;
+        });
 
         return $generalList;
     }

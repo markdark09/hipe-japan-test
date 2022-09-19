@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\WeatherForecastService;
-use Illuminate\Support\Facades\Cache;
 
 class WeatherForecastController extends Controller
 {
@@ -13,7 +12,7 @@ class WeatherForecastController extends Controller
     /**
      * Constructor of WeatherForecastController
      * 
-     * @param \WeatherForecastService $weatherForecastService
+     * @param \Services\WeatherForecastService $weatherForecastService
      */
     public function __construct(WeatherForecastService $weatherForecastService)
     {
@@ -29,8 +28,23 @@ class WeatherForecastController extends Controller
     public function generalList() 
     {
         $list = $this->weatherForecastService
-            ->generalList();
+            ->getListOfCitiesWithWeatherForecast();
 
         return responder()->success($list);
+    }
+
+    /**
+     * Use the getListOfCitiesWithWeatherForecast 
+     * and categorized base on their weather ex. 
+     * by Rain, by Sunny, and etc.
+     * 
+     * @return Responder
+     */
+    public function listByCurrentBaseWeather() 
+    {
+        $sortedByBaseWeather = $this->weatherForecastService
+            ->sortListOfCitiesByBaseWeather();
+
+        return responder()->success($sortedByBaseWeather);
     }
 }
