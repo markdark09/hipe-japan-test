@@ -3,7 +3,10 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+
+use function PHPUnit\Framework\isNull;
 
 class BatchCache extends Command
 {
@@ -26,7 +29,7 @@ class BatchCache extends Command
      *
      * @var string
      */
-    protected $description = 'Cache places by consuming geoapify';
+    protected $description = 'Cache cities by consuming geoapify';
 
     /**
      * Execute the console command.
@@ -35,18 +38,20 @@ class BatchCache extends Command
      */
     public function handle()
     {
-        $places = $this->places($this->option('limit'));
-        
-        return $this->cities($places);
+        $limit = $this->option('limit');
+        $places = $this->getPlaces($limit);
+
+        return $this->getCities($places);
     }
 
     /**
      * Get places with commercial categories in
      * japan coordicates.
      * 
-     * @param int $limit
+     * @param $limit
+     * @return array
      */
-    public function places(int $limit = 10)
+    public function getPlaces($limit = 10)
     {
         $response = Http::accept('application/json')
             ->get(self::END_POINT, [
@@ -56,19 +61,20 @@ class BatchCache extends Command
                 'apiKey' => self::API_KEY
             ]);
         
-        return $response->json()['features'];
+        return $response->json()['features'] ?? [];
     }
 
     /**
      * Store cities in cache.
      * 
      * @param array $places
+     * @return array
      */
-    public function cities($places)
+    public function getCities(array $places)
     {
-        $cities = [];
-
         if (count($places) > 0) {
+            $cities = [];
+
             foreach ($places as $key => $place) {
                 $properties = $place['properties'];
 
@@ -78,8 +84,13 @@ class BatchCache extends Command
                     'latitude' => $properties['lat']
                 ]);
             }
+
+            Cache::forever('cities', $cities);
+            $this->info('Successfully cached cities!');
+            return $cities;
         }
 
-        return $cities;
+        $this->info('No places fetched from geoapify!');
+        return [];
     }
 }
