@@ -86,49 +86,8 @@
     </div>
 </div>
 
+<script src="/livewire/js/weather.js"></script>
 <script >
-    function showFullDetails (e)
-    {
-        let coordinates = JSON.parse(e.getAttribute('data-coordinates'));
-
-        e.removeAttribute('onclick');
-
-        axios.get('/api/weather/forecast/single/details', {
-                params: {
-                    latitude: coordinates['latitude'],
-                    longitude: coordinates['longitude']
-                }
-            })
-            .then(function (response) {
-                let list = response.data.data.list;
-
-
-                list.forEach(data => {
-                    var dateTime = moment(data['dt_txt']).format('HH:mm'),
-                        description = data['weather'][0]['description'],
-                        temp_min = Math.round(data['main']['temp_min']),
-                        temp_max = Math.round(data['main']['temp_max']),
-                        imgSrc = `http://openweathermap.org/img/wn/${data['weather'][0]['icon']}@2x.png`;
-
-                    $(`#${coordinates['geoapify_id']}`).append(`
-                        <div class="col-4" style="padding-bottom: 10px;">
-                            <div class="card transparent-black">
-                                <div class="card-body card-body-custom text-center">
-                                    <div class="fs-6">${dateTime}</div>
-                                    <img 
-                                        width="80"
-                                        src="${imgSrc}"
-                                    >
-                                    <div class="fs-6">${description}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `)
-                });
-
-            });
-    }
-
     document.addEventListener('livewire:load', function () {
         axios.get('/api/weather/forecast/general-list/sort')
             .then(function (response) {
@@ -139,57 +98,4 @@
 })
 </script>
 
-<style>
-    .title-description {
-        position: relative; 
-        bottom: 9px;
-    }
-
-    .transparent-black {
-        background-color: rgba(37, 34, 34, 0.4); 
-        width: 95px;
-
-    }
-
-    .capitalized-text {
-        text-transform: capitalize;
-    }
-
-    .card-body-custom {
-        padding: 5px !important;
-    }
-
-    .card-container {
-        display: grid;
-        perspective: 700px;
-    }
-
-    .card-flip {
-        display: grid;
-        grid-template: 1fr / 1fr;
-        grid-template-areas: "frontAndBack";
-        transform-style: preserve-3d;
-        transition: all 0.7s ease;
-        width: 352px;
-    }
-
-    .card-flip div {
-        backface-visibility: hidden;
-        transform-style: preserve-3d;
-    }
-
-    .front {
-        width: 22rem;
-        grid-area: frontAndBack;
-    }
-
-    .back {
-        width: 22rem;
-        grid-area: frontAndBack;
-        transform: rotateY(-180deg);
-    }
-
-    input[type='checkbox']:checked + .card-container .card-flip {
-        transform: rotateY(180deg);
-    }
-</style>
+<link rel="stylesheet" href="/livewire/css/weather.css">

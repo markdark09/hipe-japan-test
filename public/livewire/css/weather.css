@@ -1,0 +1,52 @@
+.title-description {
+    position: relative; 
+    bottom: 9px;
+}
+
+.transparent-black {
+    background-color: rgba(37, 34, 34, 0.4); 
+    width: 95px;
+
+}
+
+.capitalized-text {
+    text-transform: capitalize;
+}
+
+.card-body-custom {
+    padding: 5px !important;
+}
+
+.card-container {
+    display: grid;
+    perspective: 700px;
+}
+
+.card-flip {
+    display: grid;
+    grid-template: 1fr / 1fr;
+    grid-template-areas: "frontAndBack";
+    transform-style: preserve-3d;
+    transition: all 0.7s ease;
+    width: 352px;
+}
+
+.card-flip div {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+.front {
+    width: 22rem;
+    grid-area: frontAndBack;
+}
+
+.back {
+    width: 22rem;
+    grid-area: frontAndBack;
+    transform: rotateY(-180deg);
+}
+
+input[type='checkbox']:checked + .card-container .card-flip {
+    transform: rotateY(180deg);
+}
