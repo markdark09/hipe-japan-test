@@ -10,19 +10,19 @@ class OpenWeatherMapLib
     CONST DOMAIN = 'https://api.openweathermap.org/data/2.5';
     CONST WEATHER_END_POINT = self::DOMAIN . '/weather';
     CONST FORECAST_END_POINT = self::DOMAIN . '/forecast';
-    CONST CNT = 7;
+    CONST CNT = 6;
     CONST UNITS = 'metric';
 
     /**
      * Get weather data of specified
      * using by coordinates.
      * 
-     * @param int $latitude
-     * @param int $longitude
+     * @param float $latitude
+     * @param float $longitude
      * 
      * @return array
      */
-    public function fetchWeatherByCoordinates(int $latitude, int $longitude)
+    public function fetchWeatherByCoordinates(float $latitude, float $longitude)
     {
         $response = Http::accept('application/json')
             ->get(self::WEATHER_END_POINT, [
@@ -40,12 +40,12 @@ class OpenWeatherMapLib
      * Get forecasted data 5days with every 
      * 3hrs using by coordinates.
      * 
-     * @param int $latitude
-     * @param int $longitude
+     * @param float $latitude
+     * @param float $longitude
      *
      * @return array
      */
-    public function fetchForecastedWeatherByCoordinates(int $latitude, int $longitude)
+    public function fetchForecastedWeatherByCoordinates(float $latitude, float $longitude)
     {
         $response = Http::accept('application/json')
             ->get(self::FORECAST_END_POINT, [

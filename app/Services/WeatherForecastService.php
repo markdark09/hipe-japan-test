@@ -3,7 +3,10 @@ namespace App\Services;
 
 use App\Libraries\OpenWeatherMapLib;
 use App\Repositories\Interfaces\IWeatherForecastRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class WeatherForecastService 
@@ -13,6 +16,7 @@ class WeatherForecastService
     
     const MAX_ATTEMPTS = 10;
     const SECONDS_LOCKED = 3600;
+    const DEFAULT_PAGINATION = 6;
 
     /**
      * WeatherForecastService constructor
@@ -32,23 +36,38 @@ class WeatherForecastService
      * Get list of cities(cached) and return 
      * the list w/ basic open weather data
      * 
+     * @param $paginate
      * @return array
      */
-    public function getListOfCitiesWithWeatherForecast() 
+    public function getListOfCitiesWithWeatherForecast($paginate = null) 
     {
-        $cities = Cache::get('cities');
+        $paginate = $paginate ?? self::DEFAULT_PAGINATION;
+        $cities = $this->paginate(Cache::get('cities'), $paginate);
         $generalList = [];
 
         if (count($cities) > 0) {
             foreach ($cities as $key => $city) {
-                array_push($generalList, 
-                    $this->openWeatherMapLib
-                        ->fetchWeatherByCoordinates($city['latitude'], $city['longitude'])
-                );
+                $weatherData = $this->openWeatherMapLib
+                    ->fetchWeatherByCoordinates($city['latitude'], $city['longitude']);
+
+                $weatherData['geoapify_coordinates'] = $city;
+                array_push($generalList, $weatherData);
             }
         }
 
         return $generalList;
+    }
+    
+    /**
+     * Paginate custom arrays.
+     * 
+     * @return object
+     */
+    public function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 
     /**
@@ -76,12 +95,12 @@ class WeatherForecastService
      * Get weather forecast of specified
      * city by id.
      * 
-     * @param int $latitude
-     * @param int $longitude
+     * @param float $latitude
+     * @param float $longitude
      * 
      * @return collection
      */
-    public function getWeatherDataByCoordinates(int $latitude, int $longitude)
+    public function getWeatherDataByCoordinates(float $latitude, float $longitude)
     {
         $cityWeather = $this->openWeatherMapLib
             ->fetchWeatherByCoordinates($latitude, $longitude);
@@ -93,12 +112,12 @@ class WeatherForecastService
      * Get weather forecast of specified
      * city by id.
      * 
-     * @param int $latitude
-     * @param int $longitude 
+     * @param float $latitude
+     * @param float $longitude 
      * 
      * @return collection
      */
-    public function getForecastedWeatherDataByCoordinates(int $latitude, int $longitude)
+    public function getForecastedWeatherDataByCoordinates(float $latitude, float $longitude)
     {
         $forecastedCity = $this->openWeatherMapLib
             ->fetchForecastedWeatherByCoordinates($latitude, $longitude);

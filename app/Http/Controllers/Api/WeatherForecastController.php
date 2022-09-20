@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CoordinatesRequest;
+use App\Http\Requests\GeneralListRequest;
 use App\Services\WeatherForecastService;
 
 class WeatherForecastController extends Controller
@@ -24,12 +25,15 @@ class WeatherForecastController extends Controller
      * Get list of cities(cached) and return 
      * the list w/ basic open weather data
      * 
+     * @param GeneralListRequest $request
+     * 
      * @return Responder
      */
-    public function generalList() 
+    public function generalList(GeneralListRequest $request) 
     {
+        $pagination = $request['pagination'] ?? null;
         $list = $this->weatherForecastService
-            ->getListOfCitiesWithWeatherForecast();
+            ->getListOfCitiesWithWeatherForecast($pagination);
 
         return responder()->success($list);
     }

@@ -41,6 +41,7 @@ class BatchCache extends Command
     {
         $geoapifyLib = $this->geoapifyLib;
         $fetchedPlaces = $geoapifyLib->fetchPlaces($this->option('limit'));
+        dd($fetchedPlaces);
         $cities = $this->geoapifyLib->getCities($fetchedPlaces);
         $this->isSuccessMessage($cities);
 
