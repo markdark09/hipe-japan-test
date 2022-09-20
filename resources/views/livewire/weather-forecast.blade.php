@@ -86,6 +86,9 @@
     function showFullDetails (e)
     {
         let coordinates = JSON.parse(e.getAttribute('data-coordinates'));
+        
+        e.removeAttribute('onclick');
+
         axios.get('/api/weather/forecast/single/details', {
                 params: {
                     latitude: coordinates['latitude'],
@@ -95,9 +98,6 @@
             .then(function (response) {
                 let list = response.data.data.list;
 
-                console.log(list)
-
-                e.removeAttribute('onclick');
 
                 list.forEach(data => {
                     var dateTime = moment(data['dt_txt']).format('HH:mm'),
@@ -121,6 +121,7 @@
                         </div>
                     `)
                 });
+
             });
     }
 
@@ -165,6 +166,7 @@
         grid-template-areas: "frontAndBack";
         transform-style: preserve-3d;
         transition: all 0.7s ease;
+        width: 352px;
     }
 
     .card-flip div {
@@ -181,8 +183,6 @@
         width: 22rem;
         grid-area: frontAndBack;
         transform: rotateY(-180deg);
-        position: relative;
-        left: 4px;
     }
 
     input[type='checkbox']:checked + .card-container .card-flip {
