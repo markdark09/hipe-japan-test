@@ -79,8 +79,6 @@
                         </label>
                     @endif
                 @endforeach
-            @else
-                <h1>No data in system cache! Kindly run "php artisan batch:cache"</h1>
             @endif
         </div>
     </div>
